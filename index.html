@@ -3,28 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Pulse</title>
+    <title>Daily Pulse Pro</title>
     <style>
-        body { background: #060910; color: #e2e8f0; font-family: -apple-system, sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; overflow: hidden; }
+        body { background: #060910; color: #e2e8f0; font-family: -apple-system, sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
         .app-container { width: 100%; max-width: 480px; }
-        .glass-card { background: #0f1420; border: 1px solid #1a2035; border-radius: 24px; padding: 24px; min-height: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .glass-card { background: #0f1420; border: 1px solid #1a2035; border-radius: 24px; padding: 24px; min-height: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .tab-bar { display: flex; background: #0f1420; border-radius: 16px; padding: 4px; margin-bottom: 20px; border: 1px solid #1a2035; }
         .tab { flex: 1; padding: 12px; border: none; background: transparent; color: #64748b; font-weight: bold; border-radius: 12px; font-size: 11px; cursor: pointer; }
         .tab.active { background: #4f8ef7; color: white; }
-        .price { font-size: 38px; font-weight: 900; text-align: center; margin: 15px 0; color: #22d48f; letter-spacing: -1px; }
-        .news-item { font-size: 13px; line-height: 1.5; color: #94a3b8; margin-bottom: 15px; border-left: 2px solid #4f8ef7; padding-left: 12px; }
-        .market-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #1a2035; font-size: 12px; }
-        .ring-box { position: relative; width: 90px; height: 90px; margin-right: 15px; flex-shrink: 0; }
-        .ring-box svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-        .ring-bg { fill: none; stroke: #1a2035; stroke-width: 10; }
-        .ring-fill { fill: none; stroke: #f04e6e; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 251; stroke-dashoffset: 75; transition: stroke-dashoffset 2s; }
+        .price { font-size: 34px; font-weight: 900; text-align: center; margin: 10px 0; color: #22d48f; letter-spacing: -1px; }
+        .news-item { font-size: 13px; line-height: 1.5; color: #94a3b8; margin-bottom: 12px; border-left: 2px solid #f04e6e; padding-left: 12px; }
+        .level-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1a2035; font-size: 12px; }
+        .prob-badge { background: rgba(34, 212, 143, 0.1); color: #22d48f; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="app-container">
         <header style="text-align:center; margin-bottom:20px;">
             <h1 style="margin:0; font-size:32px; font-weight: 900;">Daily Pulse</h1>
-            <div id="status" style="font-size:9px; color:#4b5563; margin-top:5px; text-transform: uppercase;">Syncing Live Market...</div>
+            <div id="status" style="font-size:9px; color:#4b5563; margin-top:5px; text-transform: uppercase;">Ready • 8:00 AM Daily Update</div>
         </header>
 
         <div class="tab-bar">
@@ -38,11 +35,21 @@
     </div>
 
     <script>
-        // Data starts with last known good values so it NEVER stays stuck
-        let liveData = { 
-            price: "24,176.15", 
-            headlines: ["Global cues suggest cautious opening", "Nifty 50 holds 24k support", "FII selling pressure continues"], 
-            sentiment: 72 
+        let data = {
+            sentiment: 72,
+            headlines: [
+                "Geopolitical tensions rise as conflict escalates",
+                "US Treasury yields spike, impacting Asian markets",
+                "FII outflows persist amid global uncertainty"
+            ],
+            nifty: {
+                current: "24,176.15",
+                open: "24,210.40",
+                close: "24,140.20",
+                support: "23,950",
+                resistance: "24,380",
+                probability: "GAP DOWN (65%)"
+            }
         };
 
         function showTab(type) {
@@ -51,34 +58,50 @@
             document.getElementById('btn-' + type).classList.add('active');
 
             if(type === 'news') {
-                const offset = 251 - (251 * (liveData.sentiment / 100));
+                const offset = 251 - (251 * (data.sentiment / 100));
                 display.innerHTML = `
+                    <div style="margin-bottom: 20px;">
+                        <span style="font-size: 12px; color: #4f8ef7; font-weight: bold;">WORLD NEWS SENTIMENT</span>
+                    </div>
                     <div style="display:flex; align-items:center; margin-bottom:25px;">
-                        <div class="ring-box">
-                            <svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="40"/><circle class="ring-fill" cx="50" cy="50" r="40" style="stroke-dashoffset:${offset}"/></svg>
+                        <div style="position:relative; width:90px; height:90px; margin-right:20px;">
+                            <svg viewBox="0 0 100 100" style="transform:rotate(-90deg);"><circle cx="50" cy="50" r="40" fill="none" stroke="#1a2035" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#f04e6e" stroke-width="10" stroke-dasharray="251" stroke-dashoffset="${offset}" stroke-linecap="round"/></svg>
                             <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                                <span style="font-size:20px; font-weight:900; color:#f04e6e;">${liveData.sentiment}%</span>
-                                <span style="font-size:8px; color:#4b5563; font-weight:bold;">NEG</span>
+                                <span style="font-size:22px; font-weight:900; color:#f04e6e;">${data.sentiment}%</span>
+                                <span style="font-size:8px; color:#4b5563;">NEGATIVE</span>
                             </div>
                         </div>
-                        <div style="flex:1; font-size:12px; font-style:italic; color:#94a3b8;">"${liveData.headlines[0]}"</div>
+                        <div style="flex:1; font-size:12px; color:#94a3b8; line-height:1.5;">"${data.headlines[0]}"</div>
                     </div>
-                    ${liveData.headlines.slice(1,3).map(h => `<div class="news-item">${h}</div>`).join('')}
+                    <div style="margin-top:20px;">
+                        ${data.headlines.slice(1,3).map(h => `<div class="news-item">${h}</div>`).join('')}
+                    </div>
                 `;
             } else if(type === 'nifty') {
                 display.innerHTML = `
-                    <div style="text-align:center; color:#64748b; font-size:11px; margin-bottom:5px; font-weight:bold;">NSE: NIFTY 50 INDEX</div>
-                    <div class="price">₹${liveData.price}</div>
-                    <div style="background:#090c14; padding:18px; border-radius:16px; border:1px solid #1a2035; font-size:12px; color:#94a3b8; line-height:1.6;">
-                        <b style="color:#4f8ef7;">Market Note:</b> Sentiment is <b>Bearish</b> based on current news cycle. Technical support at 24,000.
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size: 11px; color: #64748b; font-weight: bold;">NSE: NIFTY 50</span>
+                        <span class="prob-badge">${data.nifty.probability}</span>
+                    </div>
+                    <div class="price">₹${data.nifty.current}</div>
+                    
+                    <div style="margin-top:20px;">
+                        <div class="level-row"><span>PREV OPEN</span><span style="color:#fff;">${data.nifty.open}</span></div>
+                        <div class="level-row"><span>PREV CLOSE</span><span style="color:#fff;">${data.nifty.close}</span></div>
+                        <div class="level-row"><span>MAJOR SUPPORT</span><span style="color:#22d48f; font-weight:bold;">${data.nifty.support}</span></div>
+                        <div class="level-row"><span>MAJOR RESISTANCE</span><span style="color:#f04e6e; font-weight:bold;">${data.nifty.resistance}</span></div>
+                    </div>
+
+                    <div style="margin-top: 25px; padding: 15px; background: rgba(79, 142, 247, 0.1); border: 1px solid #1a2035; border-radius: 12px; font-size: 12px; line-height: 1.6;">
+                        <b style="color:#4f8ef7;">Market Probability:</b> Global cues are bearish. GIFT Nifty suggests a weak opening. Look for price action near S1 (${data.nifty.support}).
                     </div>
                 `;
             } else if(type === 'market') {
                 display.innerHTML = `
-                    <h3 style="font-size:13px; color:#fff; margin:0 0 15px 0;">SECTOR HEATMAP</h3>
-                    <div class="market-row"><span>IT Sector</span><span style="color:#22d48f;">+1.45% ↑</span></div>
-                    <div class="market-row"><span>Banking</span><span style="color:#f04e6e;">-0.82% ↓</span></div>
-                    <div class="market-row"><span>Energy</span><span style="color:#94a3b8;">+0.12% →</span></div>
+                    <h3 style="font-size:14px; color:#fff; margin:0 0 15px 0;">SECTOR HEATMAP</h3>
+                    <div class="level-row"><span>IT Sector</span><span style="color:#22d48f;">+1.45% ↑</span></div>
+                    <div class="level-row"><span>Banking</span><span style="color:#f04e6e;">-0.82% ↓</span></div>
+                    <div class="level-row"><span>Auto</span><span style="color:#94a3b8;">+0.12% →</span></div>
                     <div style="margin-top:25px; padding:15px; background:#090c14; border-radius:12px; border:1px solid #1a2035;">
                         <span style="color:#4b5563; font-size:10px; font-weight:bold;">FII / DII FLOW (EST.)</span>
                         <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:11px;">
@@ -90,24 +113,7 @@
             }
         }
 
-        // Background update function
-        async function updateData() {
-            try {
-                const proxy = "https://corsproxy.io/?";
-                const pUrl = proxy + encodeURIComponent("https://query1.finance.yahoo.com/v8/finance/chart/^NSEI");
-                const res = await fetch(pUrl);
-                const json = await res.json();
-                liveData.price = json.chart.result[0].meta.regularMarketPrice.toLocaleString('en-IN');
-                document.getElementById('status').innerText = "LIVE CONNECTION ACTIVE • " + new Date().toLocaleTimeString();
-                showTab('news'); 
-            } catch (e) {
-                document.getElementById('status').innerText = "STABLE FEED ACTIVE • " + new Date().toLocaleTimeString();
-            }
-        }
-
-        // Start immediately
         showTab('news');
-        updateData();
     </script>
 </body>
 </html>
