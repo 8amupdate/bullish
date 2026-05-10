@@ -4,143 +4,154 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Daily Pulse</title>
-    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+    <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-
     <style>
-        body { background-color: #060910 !important; color: #e2e8f0 !important; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
-        /* Force text colors to prevent the blue "link" effect */
-        a, span, p, h1, h2, h3, h4 { text-decoration: none !important; color: inherit; }
-        .glass-card { background: #0f1420; border: 1px solid #1a2035; border-radius: 24px; }
-        .inner-card { background: #090c14; border: 1px solid #1a2035; border-radius: 12px; }
-        .tab-active { background: #4f8ef7 !important; color: white !important; box-shadow: 0 4px 15px rgba(79, 142, 247, 0.3); }
-        @keyframes fill { from { stroke-dashoffset: 251; } to { stroke-dashoffset: 75; } }
-        .ring-path { stroke-dasharray: 251; stroke-dashoffset: 75; animation: fill 1.5s ease-out; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            background-color: #060910; 
+            color: #e2e8f0; 
+            font-family: -apple-system, sans-serif; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .app-container { width: 100%; max-width: 480px; padding: 20px; padding-top: 60px; }
+        
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 36px; font-weight: 900; margin: 0; color: #ffffff; letter-spacing: -1px; }
+        .header p { font-size: 10px; color: #4b5563; font-family: monospace; letter-spacing: 2px; margin-top: 5px; }
+
+        .tab-bar { 
+            display: flex; 
+            background: #0f1420; 
+            border: 1px solid #1a2035; 
+            border-radius: 16px; 
+            padding: 4px; 
+            margin-bottom: 20px; 
+        }
+        .tab { 
+            flex: 1; padding: 12px; border: none; background: transparent; 
+            color: #64748b; font-weight: bold; font-size: 12px; 
+            border-radius: 12px; cursor: pointer; transition: 0.3s;
+        }
+        .tab.active { background: #4f8ef7; color: #ffffff; box-shadow: 0 4px 12px rgba(79, 142, 247, 0.3); }
+
+        .main-card { 
+            background: #0f1420; border: 1px solid #1a2035; 
+            border-radius: 24px; padding: 24px; min-height: 420px;
+        }
+        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .section-header h2 { font-size: 14px; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+
+        .sentiment-container { display: flex; align-items: center; gap: 25px; margin-bottom: 25px; }
+        .ring-box { position: relative; width: 100px; height: 100px; }
+        .ring-box svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        .ring-bg { fill: none; stroke: #1a2035; stroke-width: 10; }
+        .ring-fill { fill: none; stroke: #f04e6e; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 251; stroke-dashoffset: 75; }
+        .ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .ring-text .percent { font-size: 22px; font-weight: 900; color: #f04e6e; line-height: 1; }
+        .ring-text .label { font-size: 8px; color: #4b5563; font-weight: bold; }
+
+        .bar-group { flex: 1; }
+        .bar-item { margin-bottom: 12px; }
+        .bar-info { display: flex; justify-content: space-between; font-size: 10px; font-weight: bold; margin-bottom: 4px; }
+        .bar-bg { height: 6px; background: #1a2035; border-radius: 10px; overflow: hidden; }
+        
+        .summary-box { 
+            background: #090c14; border: 1px solid #1a2035; border-left: 3px solid #4f8ef7; 
+            padding: 15px; border-radius: 12px; font-size: 13px; color: #94a3b8; 
+            font-style: italic; line-height: 1.6; margin-bottom: 20px;
+        }
+
+        .grid-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .mini-card { background: #090c14; border: 1px solid #1a2035; padding: 12px; border-radius: 12px; }
+        .mini-card h4 { font-size: 9px; margin: 0 0 8px 0; letter-spacing: 1px; }
+        .mini-card p { font-size: 9px; color: #64748b; margin: 0; border-left: 1px solid #334155; padding-left: 8px; }
+
+        .price-text { font-size: 28px; font-weight: 900; color: white; text-align: center; margin-bottom: 15px; }
+        .price-sub { font-size: 12px; color: #22d48f; font-weight: bold; }
+
+        .heatmap-item { display: flex; justify-content: space-between; padding: 10px; background: #090c14; border-radius: 8px; margin-bottom: 6px; border: 1px solid #1a2035; }
+        .heatmap-name { font-size: 12px; font-weight: bold; }
+        .heatmap-val { font-size: 11px; }
     </style>
 </head>
 <body>
-    <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState } = React;
+    <div class="app-container">
+        <div class="header">
+            <p>INVESTOR MORNING BRIEF</p>
+            <h1>Daily Pulse</h1>
+            <p>SUNDAY, MAY 10, 2026</p>
+        </div>
 
-        const DATA = {
-            date: "Sunday, May 10, 2026",
-            news: {
-                pos: 18, neg: 70, neu: 12,
-                summary: "Global mood is heavily negative today. The US-Israel-Iran conflict dominates headlines. A fragile 3-day Russia-Ukraine ceasefire offers hope."
-            },
-            nifty: {
-                last: "24,330", change: "+298", pct: "+1.24%",
-                support: "24,000", resist: "24,700", trend: "Bullish"
-            }
-        };
+        <div class="tab-bar">
+            <button id="btn-news" class="tab active" onclick="showTab('news')">🌐 News</button>
+            <button id="btn-nifty" class="tab" onclick="showTab('nifty')">📈 Nifty</button>
+            <button id="btn-market" class="tab" onclick="showTab('market')">🇮🇳 Market</button>
+        </div>
 
-        function App() {
-            const [tab, setTab] = useState('news');
-
-            return (
-                <div className="max-w-md mx-auto p-5 pb-10">
-                    <div className="text-center mt-12 mb-8">
-                        <h1 className="text-4xl font-black tracking-tight mb-1 text-white">Daily Pulse</h1>
-                        <p className="text-[10px] text-gray-500 font-mono tracking-[0.2em] uppercase">{DATA.date}</p>
+        <div class="main-card">
+            <div id="news-content" class="content-sec">
+                <div class="section-header"><span>🌐</span><h2>World News Sentiment</h2></div>
+                <div class="sentiment-container">
+                    <div class="ring-box">
+                        <svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="40"/><circle class="ring-fill" cx="50" cy="50" r="40"/></svg>
+                        <div class="ring-text"><span class="percent">70%</span><span class="label">NEG</span></div>
                     </div>
-
-                    {/* Navigation Tabs */}
-                    <div className="flex gap-2 p-1.5 glass-card mb-6">
-                        {['news', 'nifty', 'market'].map((t) => (
-                            <button key={t} onClick={() => setTab(t)} className={flex-1 py-3 rounded-xl text-[11px] font-bold transition-all capitalize ${tab === t ? 'tab-active' : 'text-gray-500'}}>
-                                {t === 'news' ? '🌐 News' : t === 'nifty' ? '📈 Nifty' : '🇮🇳 Market'}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="glass-card p-6 min-h-[420px]">
-                        {tab === 'news' && (
-                            <div className="animate-in fade-in duration-500">
-                                <div className="flex items-center gap-2 mb-8">
-                                    <span className="text-blue-400 text-lg">🌐</span>
-                                    <div>
-                                        <h2 className="text-sm font-bold text-white uppercase">World Sentiment</h2>
-                                        <p className="text-[9px] text-gray-500 font-mono">LIVE FEED</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-8 mb-8">
-                                    <div className="relative w-28 h-28">
-                                        <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-                                            <circle cx="50" cy="50" r="40" fill="none" stroke="#1a2035" strokeWidth="10" />
-                                            <circle cx="50" cy="50" r="40" fill="none" stroke="#f04e6e" strokeWidth="10" strokeLinecap="round" className="ring-path" />
-                                        </svg>
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                            <span className="text-2xl font-black text-[#f04e6e]">70%</span>
-                                            <span className="text-[8px] text-gray-500 font-bold uppercase">Neg</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex-1 space-y-4">
-                                        <div>
-                                            <div className="flex justify-between text-[10px] mb-1.5 text-green-400 font-bold"><span>✅ Positive</span><span>{DATA.news.pos}%</span></div>
-                                            <div className="h-1.5 w-full bg-[#1a2035] rounded-full"><div className="h-full bg-green-500 rounded-full" style={{width: DATA.news.pos+'%'}}></div></div>
-                                        </div>
-                                        <div>
-                                            <div className="flex justify-between text-[10px] mb-1.5 text-red-400 font-bold"><span>🔴 Negative</span><span>{DATA.news.neg}%</span></div>
-                                            <div className="h-1.5 w-full bg-[#1a2035] rounded-full"><div className="h-full bg-red-500 rounded-full" style={{width: DATA.news.neg+'%'}}></div></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="inner-card p-4 mb-6 border-l-2 border-blue-500/30">
-                                    <p className="text-[13px] text-gray-300 leading-relaxed italic font-serif">"{DATA.news.summary}"</p>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-3 text-white">
-                                    <div className="inner-card p-3"><h4 className="text-[9px] text-green-500 font-black mb-2 uppercase">Positive</h4><p className="text-[9px] text-gray-400 border-l border-green-500/30 pl-2">Ceasefire brokers hope.</p></div>
-                                    <div className="inner-card p-3"><h4 className="text-[9px] text-red-500 font-black mb-2 uppercase">Negative</h4><p className="text-[9px] text-gray-400 border-l border-red-500/30 pl-2">Energy markets rattle.</p></div>
-                                </div>
-                            </div>
-                        )}
-
-                        {tab === 'nifty' && (
-                            <div className="animate-in fade-in duration-500">
-                                <div className="flex items-center gap-2 mb-8">
-                                    <span className="text-green-400 text-lg">📈</span>
-                                    <h2 className="text-sm font-bold text-white uppercase">Nifty 50 Outlook</h2>
-                                </div>
-                                <div className="space-y-4">
-                                    <div className="inner-card p-4 flex justify-between items-center">
-                                        <span className="text-xs text-gray-400">Last Close</span>
-                                        <span className="text-xl font-black text-white">{DATA.nifty.last} <span className="text-xs text-green-400">{DATA.nifty.change}</span></span>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="inner-card p-4 text-center"><p className="text-[10px] text-gray-500 mb-1">SUPPORT</p><p className="text-green-400 font-bold">{DATA.nifty.support}</p></div>
-                                        <div className="inner-card p-4 text-center"><p className="text-[10px] text-gray-500 mb-1">RESISTANCE</p><p className="text-red-400 font-bold">{DATA.nifty.resist}</p></div>
-                                    </div>
-                                    <div className="inner-card p-4"><p className="text-[10px] text-gray-500 mb-2 uppercase">Tomorrow's Trend</p><p className="text-sm text-blue-400 font-bold italic">Cautiously Bullish above 24,300</p></div>
-                                </div>
-                            </div>
-                        )}
-
-                        {tab === 'market' && (
-                            <div className="animate-in fade-in duration-500 flex flex-col items-center justify-center h-64">
-                                <span className="text-4xl mb-4">🇮🇳</span>
-                                <h2 className="text-white font-bold">Indian Market</h2>
-                                <p className="text-gray-500 text-[11px] mt-2 font-mono">SECTOR HEATMAP: IT (↑), BANKING (→), ENERGY (↓)</p>
-                            </div>
-                        )}
+                    <div class="bar-group">
+                        <div class="bar-item"><div class="bar-info"><span style="color:#22d48f">✅ Positive</span><span>18%</span></div><div class="bar-bg"><div style="height:100%; width:18%; background:#22d48f;"></div></div></div>
+                        <div class="bar-item"><div class="bar-info"><span style="color:#f04e6e">🔴 Negative</span><span>70%</span></div><div class="bar-bg"><div style="height:100%; width:70%; background:#f04e6e;"></div></div></div>
                     </div>
                 </div>
-            );
-        }
+                <div class="summary-box">"Global mood is heavily negative. Middle East tensions dominate headlines. US-Israel-Iran conflict continues to rattle markets."</div>
+                <div class="grid-box">
+                    <div class="mini-card"><h4 style="color:#22d48f">POSITIVE</h4><p>Russia-Ukraine 3-day ceasefire brokers hope.</p></div>
+                    <div class="mini-card"><h4 style="color:#f04e6e">NEGATIVE</h4><p>Strait of Hormuz closure rattles energy.</p></div>
+                </div>
+            </div>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+            <div id="nifty-content" class="content-sec" style="display:none;">
+                <div class="section-header"><span>📈</span><h2>Nifty 50 Outlook</h2></div>
+                <div class="price-text">24,330 <span class="price-sub">+1.24%</span></div>
+                <div class="summary-box" style="border-left-color:#22d48f; font-style: normal;"><b>Strategy:</b> Cautiously Bullish. Next target 24,700. Stop loss at 23,950.</div>
+                <div class="grid-box" style="margin-bottom:15px;">
+                    <div class="mini-card"><h4 style="color:#4f8ef7">SUPPORT</h4><p>24,000 / 23,800</p></div>
+                    <div class="mini-card"><h4 style="color:#f04e6e">RESISTANCE</h4><p>24,700 / 25,000</p></div>
+                </div>
+                <div class="mini-card" style="width:100%"><h4 style="color:#a78bfa">BANK NIFTY</h4><p>55,981 (+1,434 pts) - Leading the recovery.</p></div>
+            </div>
+
+            <div id="market-content" class="content-sec" style="display:none;">
+                <div class="section-header"><span>🇮🇳</span><h2>Indian Market Heatmap</h2></div>
+                <div class="heatmap-item"><span class="heatmap-name">IT Sector</span><span class="heatmap-val" style="color:#22d48f">↑ Bullish (68)</span></div>
+                <div class="heatmap-item"><span class="heatmap-name">Banking</span><span class="heatmap-val" style="color:#64748b">→ Neutral (44)</span></div>
+                <div class="heatmap-item"><span class="heatmap-name">Energy</span><span class="heatmap-val" style="color:#f04e6e">↓ Bearish (32)</span></div>
+                <div style="font-size: 10px; color:#4b5563; margin: 20px 0 10px 0; font-weight:bold;">KEY FACTORS</div>
+                <div class="summary-box" style="font-style: normal; font-size: 11px;">
+                    • DII Buying Support: +₹1,869 Cr<br>
+                    • USD/INR: ₹95.27 (Pressure)<br>
+                    • Crude Oil: Rising via Hormuz closure
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            // Hide all
+            document.querySelectorAll('.content-sec').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            
+            // Show target
+            document.getElementById(tabId + '-content').style.display = 'block';
+            document.getElementById('btn-' + tabId).classList.add('active');
+        }
     </script>
 </body>
 </html>
