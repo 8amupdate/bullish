@@ -3,133 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Pulse Insights</title>
+    <title>Daily Pulse Pro</title>
     <style>
-        body { background: #060910; color: #e2e8f0; font-family: -apple-system, sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .app-container { width: 100%; max-width: 480px; }
-        .glass-card { background: #0f1420; border: 1px solid #1a2035; border-radius: 24px; padding: 24px; min-height: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .tab-bar { display: flex; background: #0f1420; border-radius: 16px; padding: 4px; margin-bottom: 20px; border: 1px solid #1a2035; }
-        .tab { flex: 1; padding: 12px; border: none; background: transparent; color: #64748b; font-weight: bold; border-radius: 12px; font-size: 10px; cursor: pointer; }
-        .tab.active { background: #4f8ef7; color: white; }
+        :root {
+            --bg: #0d1117;
+            --card-bg: #161b22;
+            --border: #30363d;
+            --pos: #23d18b;
+            --neg: #f04e6e;
+            --neu: #f1c40f;
+            --text: #c9d1d9;
+            --text-dim: #8b949e;
+            --accent: #388bfd;
+        }
+
+        body { 
+            background: var(--bg); color: var(--text); 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+            margin: 0; padding: 15px; display: flex; justify-content: center;
+        }
+
+        .app-container { width: 100%; max-width: 440px; }
+
+        header { text-align: center; margin-bottom: 20px; }
+        .tab-bar { 
+            display: flex; background: var(--card-bg); border-radius: 14px; 
+            padding: 4px; margin-bottom: 20px; border: 1px solid var(--border);
+            overflow-x: auto;
+        }
+        .tab { 
+            flex: 1; padding: 10px 5px; border: none; background: transparent; 
+            color: var(--text-dim); font-weight: 600; border-radius: 10px; font-size: 11px;
+            white-space: nowrap; cursor: pointer;
+        }
+        .tab.active { background: var(--accent); color: white; }
+
+        .glass-card { 
+            background: var(--card-bg); border: 1px solid var(--border); 
+            border-radius: 24px; padding: 20px; min-height: 520px;
+        }
+
+        /* Donut Chart */
+        .donut-container { display: flex; align-items: center; justify-content: space-around; margin-bottom: 25px; }
+        .donut-box { position: relative; width: 100px; height: 100px; }
+        .donut-box svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        .donut-center {
+            position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+        }
+
+        /* Bars */
+        .stat-row { margin-bottom: 12px; }
+        .stat-header { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; }
+        .bar-bg { background: #21262d; height: 6px; border-radius: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 10px; }
+
+        /* Level Cards */
+        .level-card {
+            background: #0d1117; border-radius: 12px; padding: 12px 16px;
+            margin-bottom: 8px; display: flex; justify-content: space-between;
+            align-items: center; border: 1px solid var(--border);
+        }
+        .level-label { font-size: 11px; color: var(--text-dim); font-weight: 500; }
+        .level-val { font-size: 13px; font-weight: 700; font-family: monospace; }
+
+        /* Insight Box */
+        .insight-box {
+            background: rgba(56, 139, 253, 0.05); border: 1px dashed var(--border); 
+            border-radius: 16px; padding: 14px; margin-top: 15px; font-size: 12px; 
+            line-height: 1.5; color: var(--text-dim);
+        }
+        .insight-title { color: var(--accent); font-weight: bold; font-size: 10px; margin-bottom: 5px; text-transform: uppercase; display: block; }
         
-        /* New Insight Box Styling */
-        .insight-box { background: rgba(79, 142, 247, 0.05); border: 1px dashed #1a2035; border-radius: 16px; padding: 15px; margin-top: 15px; font-size: 12px; line-height: 1.5; color: #94a3b8; }
-        .insight-title { color: #4f8ef7; font-weight: bold; font-size: 10px; margin-bottom: 5px; text-transform: uppercase; display: block; }
-        
-        .price { font-size: 34px; font-weight: 900; text-align: center; margin: 10px 0; color: #22d48f; letter-spacing: -1px; }
-        .news-item { font-size: 12px; line-height: 1.4; color: #e2e8f0; margin-bottom: 12px; border-left: 2px solid #4f8ef7; padding-left: 12px; }
-        .level-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1a2035; font-size: 12px; }
-        .prob-badge { background: rgba(240, 78, 110, 0.1); color: #f04e6e; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: bold; }
+        .news-item { font-size: 12px; line-height: 1.4; color: var(--text); margin-bottom: 10px; border-left: 2px solid var(--accent); padding-left: 10px; }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <header style="text-align:center; margin-bottom:20px;">
-            <h1 style="margin:0; font-size:32px; font-weight: 900;">Daily Pulse</h1>
-            <div id="status" style="font-size:9px; color:#4b5563; margin-top:5px; text-transform: uppercase;">Insights Active • Live Feed</div>
+        <header>
+            <h1 style="margin:0; font-size:24px;">Daily Pulse</h1>
+            <div id="status" style="font-size:9px; color:var(--text-dim); margin-top:5px; text-transform: uppercase;">Hourly Sync Active</div>
         </header>
 
         <div class="tab-bar">
-            <button id="btn-news" class="tab active" onclick="showTab('news')">🌐 Sentiment</button>
-            <button id="btn-nifty" class="tab" onclick="showTab('nifty')">📈 Nifty 50</button>
-            <button id="btn-market" class="tab" onclick="showTab('market')">🇮🇳 Market</button>
+            <button id="btn-news" class="tab active" onclick="show('news')">🌐 News</button>
+            <button id="btn-nifty" class="tab" onclick="show('nifty')">📈 Nifty</button>
+            <button id="btn-market" class="tab" onclick="show('market')">🇮🇳 Market</button>
+            <button id="btn-commo" class="tab" onclick="show('commo')">⛽ Commo</button>
         </div>
 
-        <div class="glass-card" id="display">
-            </div>
+        <div class="glass-card" id="display"></div>
     </div>
 
     <script>
         const store = {
-            sentiment: 74,
+            sentiment: { pos: 15, neg: 71, neu: 14 },
             worldNews: [
-                "US Federal Reserve signals 'Higher for Longer' interest rates.",
-                "Crude oil prices stabilize amid Middle East ceasefire talks.",
-                "Tech sell-off in NASDAQ spills over to Asian markets."
+                "Global bond yields hit multi-year highs.",
+                "US Tech sector faces regulatory headwinds.",
+                "Supply chain disruptions ease in Asian hubs."
             ],
-            worldPossibility: "Expect volatility in currency markets; Dollar Index (DXY) strength may pressure emerging market stocks today.",
+            worldOutlook: "Expect sustained pressure on equities as central banks maintain hawkish stances. Dollar strength is the key metric to watch.",
             nifty: {
                 current: "24,176.15",
-                open: "24,210", close: "24,140", s1: "23,950", r1: "24,380",
+                levels: [
+                    { l: "Major Resistance", v: "24,500", c: "var(--neg)" },
+                    { l: "Support (S1)", v: "23,950", c: "var(--pos)" }
+                ],
                 prob: "GAP DOWN (60%)",
-                trend: "Nifty likely to test S1 levels at open. If 23,950 holds, expect a short-covering rally towards VWAP.",
-                news: "Reliance earnings call and HDFC Bank's FII flow data will be the primary drivers for today's session."
+                trend: "Bearish bias below 24,200. Look for consolidation at S1 before any recovery attempts.",
+                movers: "FII selling in heavyweights (HDFC, Reliance) remains the biggest drag on the index."
             },
             market: {
                 sectors: [
-                    {name: "IT Sector", val: "+1.2%"},
-                    {name: "Banking", val: "-0.9%"},
-                    {name: "Reliance", val: "+0.1%"}
+                    {n: "IT Sector", v: "+1.1%", c: "var(--pos)"},
+                    {n: "Banking", v: "-0.8%", c: "var(--neg)"},
+                    {n: "Auto", v: "+0.2%", c: "var(--neu)"}
                 ],
-                drivers: "Rising crude prices and a weakening Rupee are the main headwinds for the domestic market today.",
                 indiaNews: [
-                    "RBI Governor's speech scheduled for 10:00 AM.",
-                    "Record GST collection figures boost fiscal sentiment.",
-                    "Monsoon progress ahead of schedule in Southern India."
+                    "RBI policy meeting minutes released.",
+                    "Blue-chip earnings season starts positively.",
+                    "Infrastructure spend hit record highs this quarter."
+                ],
+                domesticImpact: "Strong DII support is balancing FII outflows, keeping the broader market from a deep correction."
+            },
+            commo: {
+                items: [
+                    {n: "Gold (24k)", v: "₹72,450", c: "var(--neu)"},
+                    {n: "Silver", v: "₹84,200", c: "var(--text)"},
+                    {n: "Crude Oil", v: "$78.40", c: "var(--neg)"}
+                ],
+                insight: "Gold prices are hedging against geopolitical risk, while Oil remains volatile due to production cuts.",
+                news: [
+                    "Gold hits resistance at $2,400 level.",
+                    "Crude inventory data shows unexpected builds.",
+                    "Silver demand spikes for industrial use."
                 ]
             }
         };
 
-        function showTab(type) {
+        function show(type) {
             const display = document.getElementById('display');
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.getElementById('btn-' + type).classList.add('active');
 
             if(type === 'news') {
-                const offset = 251 - (251 * (store.sentiment / 100));
+                const off = 251 - (251 * (store.sentiment.neg / 100));
                 display.innerHTML = `
-                    <div style="display:flex; align-items:center; margin-bottom:25px;">
-                        <div style="position:relative; width:80px; height:80px; margin-right:20px;">
-                            <svg viewBox="0 0 100 100" style="transform:rotate(-90deg);"><circle cx="50" cy="50" r="40" fill="none" stroke="#1a2035" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#f04e6e" stroke-width="10" stroke-dasharray="251" stroke-dashoffset="${offset}" stroke-linecap="round"/></svg>
-                            <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                                <span style="font-size:18px; font-weight:900; color:#f04e6e;">${store.sentiment}%</span>
-                                <span style="font-size:7px; color:#4b5563; font-weight:bold;">NEG</span>
-                            </div>
+                    <div class="donut-container">
+                        <div class="donut-box">
+                            <svg viewBox="0 0 36 36"><circle stroke="#21262d" stroke-width="3" fill="transparent" r="16" cx="18" cy="18"/><circle stroke="var(--neg)" stroke-width="3" stroke-dasharray="71 29" fill="transparent" r="16" cx="18" cy="18" style="stroke-dashoffset:0"/></svg>
+                            <div class="donut-center"><span style="font-size:18px; font-weight:800; color:var(--neg);">${store.sentiment.neg}%</span><span style="font-size:7px; color:var(--text-dim); font-weight:bold;">NEG</span></div>
                         </div>
-                        <div style="flex:1; font-size:11px; color:#94a3b8; font-style:italic;">"Sentiment remains cautious as global yields remain elevated."</div>
+                        <div style="flex:1; padding-left:15px;">
+                            ${statRow("Positive", store.sentiment.pos, "var(--pos)")}
+                            ${statRow("Negative", store.sentiment.neg, "var(--neg)")}
+                            ${statRow("Neutral", store.sentiment.neu, "var(--neu)")}
+                        </div>
                     </div>
-                    <div style="margin-bottom:10px; font-size:10px; color:#4f8ef7; font-weight:bold;">TRENDING WORLD NEWS</div>
+                    <div style="font-size:10px; color:var(--accent); font-weight:bold; margin-bottom:10px;">WORLD NEWS HEADLINES</div>
                     ${store.worldNews.map(n => `<div class="news-item">${n}</div>`).join('')}
-                    <div class="insight-box">
-                        <span class="insight-title">🌐 Global Outlook</span>
-                        ${store.worldPossibility}
-                    </div>
+                    <div class="insight-box"><span class="insight-title">🌐 Global Outlook</span>${store.worldOutlook}</div>
                 `;
             } else if(type === 'nifty') {
                 display.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size: 11px; color: #64748b; font-weight: bold;">NIFTY 50 DESK</span>
-                        <span class="prob-badge">${store.nifty.prob}</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span style="font-size: 10px; color: var(--text-dim); font-weight: bold;">NIFTY 50 DESK</span>
+                        <span style="background:rgba(240,78,110,0.1); color:var(--neg); padding:4px 8px; border-radius:6px; font-size:9px; font-weight:bold;">${store.nifty.prob}</span>
                     </div>
-                    <div class="price">₹${store.nifty.current}</div>
-                    <div class="level-row"><span>S1 / R1</span><span style="color:#fff;">${store.nifty.s1} / ${store.nifty.r1}</span></div>
-                    
-                    <div class="insight-box" style="border-style: solid; border-color: rgba(34, 212, 143, 0.2);">
-                        <span class="insight-title" style="color:#22d48f;">🚀 Probability & Trend</span>
-                        ${store.nifty.trend}
-                    </div>
-                    <div class="insight-box">
-                        <span class="insight-title">📢 Market Movers</span>
-                        ${store.nifty.news}
-                    </div>
+                    <div style="font-size:32px; font-weight:900; text-align:center; color:var(--pos); margin-bottom:15px;">₹${store.nifty.current}</div>
+                    ${store.nifty.levels.map(l => `<div class="level-card"><span>${l.l}</span><span style="color:${l.c}">${l.v}</span></div>`).join('')}
+                    <div class="insight-box" style="border-color:var(--pos)"><span class="insight-title" style="color:var(--pos)">🚀 Probability & Trend</span>${store.nifty.trend}</div>
+                    <div class="insight-box"><span class="insight-title">📢 Market Movers</span>${store.nifty.movers}</div>
                 `;
             } else if(type === 'market') {
                 display.innerHTML = `
-                    <div style="margin-bottom:15px; font-size:10px; color:#4f8ef7; font-weight:bold;">SECTOR HEATMAP</div>
-                    ${store.market.sectors.map(s => `<div class="level-row"><span>${s.name}</span><span style="${s.val.includes('+') ? 'color:#22d48f' : 'color:#f04e6e'}">${s.val}</span></div>`).join('')}
-                    
-                    <div class="insight-box" style="background: rgba(255, 255, 255, 0.02);">
-                        <span class="insight-title">🇮🇳 Domestic Impact</span>
-                        ${store.market.drivers}
-                    </div>
-
-                    <div style="margin-top:20px; font-size:10px; color:#4f8ef7; font-weight:bold;">TOP 3 INDIA HEADLINES</div>
-                    ${store.market.indiaNews.map(n => `<div class="news-item" style="border-color:#22d48f;">${n}</div>`).join('')}
+                    <div style="font-size:10px; color:var(--accent); font-weight:bold; margin-bottom:10px;">SECTOR HEATMAP</div>
+                    ${store.market.sectors.map(s => `<div class="level-card"><span>${s.n}</span><span style="color:${s.c}">${s.v}</span></div>`).join('')}
+                    <div class="insight-box"><span class="insight-title">🇮🇳 Domestic Impact</span>${store.market.domesticImpact}</div>
+                    <div style="font-size:10px; color:var(--accent); font-weight:bold; margin-top:15px; margin-bottom:10px;">TOP INDIA NEWS</div>
+                    ${store.market.indiaNews.map(n => `<div class="news-item" style="border-color:var(--pos)">${n}</div>`).join('')}
+                `;
+            } else if(type === 'commo') {
+                display.innerHTML = `
+                    <div style="font-size:10px; color:var(--accent); font-weight:bold; margin-bottom:10px;">COMMODITY PRICES</div>
+                    ${store.commo.items.map(i => `<div class="level-card"><span>${i.n}</span><span style="color:${i.c}">${i.v}</span></div>`).join('')}
+                    <div class="insight-box" style="border-color:var(--neu)"><span class="insight-title" style="color:var(--neu)">⛽ Energy & Metal Insight</span>${store.commo.insight}</div>
+                    <div style="font-size:10px; color:var(--accent); font-weight:bold; margin-top:15px; margin-bottom:10px;">COMMODITY NEWS</div>
+                    ${store.commo.news.map(n => `<div class="news-item" style="border-color:var(--neu)">${n}</div>`).join('')}
                 `;
             }
         }
 
-        showTab('news');
+        function statRow(l, v, c) { return `<div class="stat-row"><div class="stat-header"><span>${l}</span><span style="color:${c}">${v}%</span></div><div class="bar-bg"><div class="bar-fill" style="width:${v}%; background:${c}"></div></div></div>`; }
+
+        show('news');
     </script>
 </body>
 </html>
