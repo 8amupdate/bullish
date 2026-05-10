@@ -6,35 +6,49 @@
     <title>Daily Pulse</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
     <style>
-        * { box-sizing: border-box; }
-        body { background-color: #090c14; color: #e2e8f0; font-family: -apple-system, sans-serif; margin: 0; display: flex; justify-content: center; }
-        .app-container { width: 100%; max-width: 480px; padding: 25px; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .chip { font-size: 10px; letter-spacing: 2px; color: #4f8ef7; font-weight: bold; }
-        h1 { font-size: 32px; margin: 5px 0; font-weight: 900; background: linear-gradient(to right, #fff, #4f8ef7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .date { font-size: 11px; color: #4b5563; }
+        :root { --bg: #060910; --card: #0f1420; --border: #1a2035; --blue: #4f8ef7; --red: #f04e6e; --green: #22d48f; }
+        body { background: var(--bg); color: #e2e8f0; font-family: -apple-system, sans-serif; margin: 0; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 480px; padding: 20px; }
         
-        .card { background: #0f1420; border: 1px solid #1a2035; border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .news-title { color: #f04e6e; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        .news-text { font-size: 14px; line-height: 1.6; color: #94a3b8; font-style: italic; }
-        
-        .nifty-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #1a2035; font-size: 13px; }
-        .label { color: #4b5563; }
-        .value { font-weight: bold; color: #22d48f; }
+        .header { text-align: center; margin: 40px 0 30px; }
+        h1 { font-size: 32px; margin: 0; font-weight: 900; letter-spacing: -1px; }
+        .date { font-size: 11px; color: #4b5563; margin-top: 5px; font-family: monospace; }
+
+        /* Navigation Tabs */
+        .tabs { display: flex; gap: 8px; background: var(--card); padding: 5px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 25px; }
+        .tab { flex: 1; padding: 12px; border-radius: 12px; text-align: center; font-size: 12px; font-weight: bold; color: #94a3b8; text-decoration: none; }
+        .tab.active { background: var(--blue); color: white; box-shadow: 0 4px 12px rgba(79, 142, 247, 0.3); }
+
+        /* Main Dashboard Card */
+        .glass-card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 24px; }
+        .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+        .section-header span { color: var(--blue); }
+        .section-header h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+
+        /* Sentiment Circle Area */
+        .sentiment-box { display: flex; align-items: center; gap: 30px; margin-bottom: 25px; }
+        .circle { position: relative; width: 90px; height: 90px; border-radius: 50%; background: conic-gradient(var(--red) 70%, var(--green) 70% 88%, #f5c542 88%); display: flex; align-items: center; justify-content: center; }
+        .circle::after { content: "70%\nNEG"; white-space: pre; position: absolute; width: 70px; height: 70px; background: var(--card); border-radius: 50%; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 14px; font-weight: 900; color: var(--red); line-height: 1; }
+
+        .bars { flex: 1; }
+        .bar-row { margin-bottom: 12px; }
+        .bar-label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; }
+        .bar-bg { height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 10px; }
+
+        .summary { font-size: 13px; line-height: 1.6; color: #94a3b8; font-style: italic; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 20px; }
     </style>
 </head>
 <body>
-
-    <div class="app-container">
+    <div class="container">
         <div class="header">
-            <div class="chip">INVESTOR MORNING BRIEF</div>
             <h1>Daily Pulse</h1>
             <div class="date">SUNDAY, MAY 10, 2026</div>
         </div>
 
-        <div class="card">
+        <div class="tabs">
+            <a href="#"        <div class="card">
             <div class="news-title">🌐 WORLD SENTIMENT</div>
             <div class="news-text">
                 "Global mood is heavily negative today. The US-Israel-Iran conflict dominates headlines. A fragile 3-day ceasefire offers a small ray of hope."
