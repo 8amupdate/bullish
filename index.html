@@ -4,76 +4,143 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Daily Pulse</title>
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
-        :root { --bg: #060910; --card: #0f1420; --border: #1a2035; --blue: #4f8ef7; --red: #f04e6e; --green: #22d48f; }
-        body { background: var(--bg); color: #e2e8f0; font-family: -apple-system, sans-serif; margin: 0; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 480px; padding: 20px; }
-        
-        .header { text-align: center; margin: 40px 0 30px; }
-        h1 { font-size: 32px; margin: 0; font-weight: 900; letter-spacing: -1px; }
-        .date { font-size: 11px; color: #4b5563; margin-top: 5px; font-family: monospace; }
-
-        /* Navigation Tabs */
-        .tabs { display: flex; gap: 8px; background: var(--card); padding: 5px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 25px; }
-        .tab { flex: 1; padding: 12px; border-radius: 12px; text-align: center; font-size: 12px; font-weight: bold; color: #94a3b8; text-decoration: none; }
-        .tab.active { background: var(--blue); color: white; box-shadow: 0 4px 12px rgba(79, 142, 247, 0.3); }
-
-        /* Main Dashboard Card */
-        .glass-card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 24px; }
-        .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
-        .section-header span { color: var(--blue); }
-        .section-header h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
-
-        /* Sentiment Circle Area */
-        .sentiment-box { display: flex; align-items: center; gap: 30px; margin-bottom: 25px; }
-        .circle { position: relative; width: 90px; height: 90px; border-radius: 50%; background: conic-gradient(var(--red) 70%, var(--green) 70% 88%, #f5c542 88%); display: flex; align-items: center; justify-content: center; }
-        .circle::after { content: "70%\nNEG"; white-space: pre; position: absolute; width: 70px; height: 70px; background: var(--card); border-radius: 50%; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 14px; font-weight: 900; color: var(--red); line-height: 1; }
-
-        .bars { flex: 1; }
-        .bar-row { margin-bottom: 12px; }
-        .bar-label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; }
-        .bar-bg { height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; }
-        .bar-fill { height: 100%; border-radius: 10px; }
-
-        .summary { font-size: 13px; line-height: 1.6; color: #94a3b8; font-style: italic; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 20px; }
+        body { background-color: #060910 !important; color: #e2e8f0 !important; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        /* Force text colors to prevent the blue "link" effect */
+        a, span, p, h1, h2, h3, h4 { text-decoration: none !important; color: inherit; }
+        .glass-card { background: #0f1420; border: 1px solid #1a2035; border-radius: 24px; }
+        .inner-card { background: #090c14; border: 1px solid #1a2035; border-radius: 12px; }
+        .tab-active { background: #4f8ef7 !important; color: white !important; box-shadow: 0 4px 15px rgba(79, 142, 247, 0.3); }
+        @keyframes fill { from { stroke-dashoffset: 251; } to { stroke-dashoffset: 75; } }
+        .ring-path { stroke-dasharray: 251; stroke-dashoffset: 75; animation: fill 1.5s ease-out; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Daily Pulse</h1>
-            <div class="date">SUNDAY, MAY 10, 2026</div>
-        </div>
+    <div id="root"></div>
 
-        <div class="tabs">
-            <a href="#"        <div class="card">
-            <div class="news-title">🌐 WORLD SENTIMENT</div>
-            <div class="news-text">
-                "Global mood is heavily negative today. The US-Israel-Iran conflict dominates headlines. A fragile 3-day ceasefire offers a small ray of hope."
-            </div>
-            
-            <div style="margin-top: 25px; margin-bottom: 10px; font-size: 12px; font-weight: bold; color: #4f8ef7;">📈 MARKET SNAPSHOT</div>
-            
-            <div class="nifty-row">
-                <span class="label">Nifty 50</span>
-                <span class="value">24,330 (+1.24%)</span>
-            </div>
-            <div class="nifty-row">
-                <span class="label">Outlook</span>
-                <span class="value" style="color: #4f8ef7;">Bullish</span>
-            </div>
-            <div class="nifty-row" style="border: none;">
-                <span class="label">Support</span>
-                <span class="value">24,000</span>
-            </div>
-        </div>
-        
-        <div style="text-align: center; margin-top: 40px; font-size: 10px; color: #1a2035; font-family: monospace;">
-            VERIFIED STABLE VERSION 1.0
-        </div>
-    </div>
+    <script type="text/babel">
+        const { useState } = React;
 
+        const DATA = {
+            date: "Sunday, May 10, 2026",
+            news: {
+                pos: 18, neg: 70, neu: 12,
+                summary: "Global mood is heavily negative today. The US-Israel-Iran conflict dominates headlines. A fragile 3-day Russia-Ukraine ceasefire offers hope."
+            },
+            nifty: {
+                last: "24,330", change: "+298", pct: "+1.24%",
+                support: "24,000", resist: "24,700", trend: "Bullish"
+            }
+        };
+
+        function App() {
+            const [tab, setTab] = useState('news');
+
+            return (
+                <div className="max-w-md mx-auto p-5 pb-10">
+                    <div className="text-center mt-12 mb-8">
+                        <h1 className="text-4xl font-black tracking-tight mb-1 text-white">Daily Pulse</h1>
+                        <p className="text-[10px] text-gray-500 font-mono tracking-[0.2em] uppercase">{DATA.date}</p>
+                    </div>
+
+                    {/* Navigation Tabs */}
+                    <div className="flex gap-2 p-1.5 glass-card mb-6">
+                        {['news', 'nifty', 'market'].map((t) => (
+                            <button key={t} onClick={() => setTab(t)} className={flex-1 py-3 rounded-xl text-[11px] font-bold transition-all capitalize ${tab === t ? 'tab-active' : 'text-gray-500'}}>
+                                {t === 'news' ? '🌐 News' : t === 'nifty' ? '📈 Nifty' : '🇮🇳 Market'}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="glass-card p-6 min-h-[420px]">
+                        {tab === 'news' && (
+                            <div className="animate-in fade-in duration-500">
+                                <div className="flex items-center gap-2 mb-8">
+                                    <span className="text-blue-400 text-lg">🌐</span>
+                                    <div>
+                                        <h2 className="text-sm font-bold text-white uppercase">World Sentiment</h2>
+                                        <p className="text-[9px] text-gray-500 font-mono">LIVE FEED</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-8 mb-8">
+                                    <div className="relative w-28 h-28">
+                                        <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                                            <circle cx="50" cy="50" r="40" fill="none" stroke="#1a2035" strokeWidth="10" />
+                                            <circle cx="50" cy="50" r="40" fill="none" stroke="#f04e6e" strokeWidth="10" strokeLinecap="round" className="ring-path" />
+                                        </svg>
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                            <span className="text-2xl font-black text-[#f04e6e]">70%</span>
+                                            <span className="text-[8px] text-gray-500 font-bold uppercase">Neg</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex-1 space-y-4">
+                                        <div>
+                                            <div className="flex justify-between text-[10px] mb-1.5 text-green-400 font-bold"><span>✅ Positive</span><span>{DATA.news.pos}%</span></div>
+                                            <div className="h-1.5 w-full bg-[#1a2035] rounded-full"><div className="h-full bg-green-500 rounded-full" style={{width: DATA.news.pos+'%'}}></div></div>
+                                        </div>
+                                        <div>
+                                            <div className="flex justify-between text-[10px] mb-1.5 text-red-400 font-bold"><span>🔴 Negative</span><span>{DATA.news.neg}%</span></div>
+                                            <div className="h-1.5 w-full bg-[#1a2035] rounded-full"><div className="h-full bg-red-500 rounded-full" style={{width: DATA.news.neg+'%'}}></div></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="inner-card p-4 mb-6 border-l-2 border-blue-500/30">
+                                    <p className="text-[13px] text-gray-300 leading-relaxed italic font-serif">"{DATA.news.summary}"</p>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3 text-white">
+                                    <div className="inner-card p-3"><h4 className="text-[9px] text-green-500 font-black mb-2 uppercase">Positive</h4><p className="text-[9px] text-gray-400 border-l border-green-500/30 pl-2">Ceasefire brokers hope.</p></div>
+                                    <div className="inner-card p-3"><h4 className="text-[9px] text-red-500 font-black mb-2 uppercase">Negative</h4><p className="text-[9px] text-gray-400 border-l border-red-500/30 pl-2">Energy markets rattle.</p></div>
+                                </div>
+                            </div>
+                        )}
+
+                        {tab === 'nifty' && (
+                            <div className="animate-in fade-in duration-500">
+                                <div className="flex items-center gap-2 mb-8">
+                                    <span className="text-green-400 text-lg">📈</span>
+                                    <h2 className="text-sm font-bold text-white uppercase">Nifty 50 Outlook</h2>
+                                </div>
+                                <div className="space-y-4">
+                                    <div className="inner-card p-4 flex justify-between items-center">
+                                        <span className="text-xs text-gray-400">Last Close</span>
+                                        <span className="text-xl font-black text-white">{DATA.nifty.last} <span className="text-xs text-green-400">{DATA.nifty.change}</span></span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="inner-card p-4 text-center"><p className="text-[10px] text-gray-500 mb-1">SUPPORT</p><p className="text-green-400 font-bold">{DATA.nifty.support}</p></div>
+                                        <div className="inner-card p-4 text-center"><p className="text-[10px] text-gray-500 mb-1">RESISTANCE</p><p className="text-red-400 font-bold">{DATA.nifty.resist}</p></div>
+                                    </div>
+                                    <div className="inner-card p-4"><p className="text-[10px] text-gray-500 mb-2 uppercase">Tomorrow's Trend</p><p className="text-sm text-blue-400 font-bold italic">Cautiously Bullish above 24,300</p></div>
+                                </div>
+                            </div>
+                        )}
+
+                        {tab === 'market' && (
+                            <div className="animate-in fade-in duration-500 flex flex-col items-center justify-center h-64">
+                                <span className="text-4xl mb-4">🇮🇳</span>
+                                <h2 className="text-white font-bold">Indian Market</h2>
+                                <p className="text-gray-500 text-[11px] mt-2 font-mono">SECTOR HEATMAP: IT (↑), BANKING (→), ENERGY (↓)</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
 </body>
 </html>
